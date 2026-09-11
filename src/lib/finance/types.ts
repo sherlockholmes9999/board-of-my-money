@@ -49,16 +49,16 @@ export interface Account {
   openingBalance: number;
   currency: string;
   /** Liability accounts (credit card / debt) are shown under liabilities. */
-  isLiability?: boolean;
+  isLiability?: boolean | undefined;
 }
 
 export interface Category {
   id: string;
   name: string;
   color: string;
-  icon?: string;
+  icon?: string | undefined;
   /** Planned budget for the current period, entered manually. */
-  planned?: number;
+  planned?: number | undefined;
 }
 
 export interface PlanningColumn {
@@ -77,12 +77,12 @@ export interface Transaction {
   date: string;
   columnId: string;
   accountId: string;
-  toAccountId?: string;
+  toAccountId?: string | undefined;
   categoryId: string;
   direction: Direction;
   accountingType: AccountingType;
   cashflowType: CashflowType;
-  notes?: string;
+  notes?: string | undefined;
   createdAt: string;
   updatedAt: string;
 }

@@ -125,13 +125,13 @@ export function TransactionDialogProvider({ children }: { children: ReactNode })
   function submit() {
     if (!form) return;
     const nextErrors: Record<string, string> = {};
-    if (!form.title.trim()) nextErrors.title = "Give the transaction a name.";
+    if (!form.title.trim()) nextErrors['title'] = "Give the transaction a name.";
     const amount = Number(form.amount);
     if (!form.amount || Number.isNaN(amount) || amount <= 0)
-      nextErrors.amount = "Enter an amount greater than zero.";
-    if (!form.columnId) nextErrors.columnId = "Choose a planning period.";
+      nextErrors['amount'] = "Enter an amount greater than zero.";
+    if (!form.columnId) nextErrors['columnId'] = "Choose a planning period.";
     if (isTransfer && form.accountId === form.toAccountId)
-      nextErrors.toAccountId = "Choose two different accounts.";
+      nextErrors['toAccountId'] = "Choose two different accounts.";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
@@ -169,7 +169,7 @@ export function TransactionDialogProvider({ children }: { children: ReactNode })
 
           {form ? (
             <div className="grid gap-4 px-6 py-5 sm:grid-cols-2">
-              <Field label="Name" error={errors.title} className="sm:col-span-2">
+              <Field label="Name" error={errors['title']} className="sm:col-span-2">
                 <Input
                   value={form.title}
                   onChange={(e) => set("title", e.target.value)}
@@ -178,7 +178,7 @@ export function TransactionDialogProvider({ children }: { children: ReactNode })
                 />
               </Field>
 
-              <Field label="Amount" error={errors.amount}>
+              <Field label="Amount" error={errors['amount']}>
                 <Input
                   type="number"
                   inputMode="decimal"
@@ -234,7 +234,7 @@ export function TransactionDialogProvider({ children }: { children: ReactNode })
                 />
               </Field>
 
-              <Field label="Planning Period" error={errors.columnId}>
+              <Field label="Planning Period" error={errors['columnId']}>
                 <Select value={form.columnId} onValueChange={(v) => set("columnId", v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select period" />
@@ -265,7 +265,7 @@ export function TransactionDialogProvider({ children }: { children: ReactNode })
               </Field>
 
               {isTransfer ? (
-                <Field label="To Account" error={errors.toAccountId}>
+                <Field label="To Account" error={errors['toAccountId']}>
                   <Select value={form.toAccountId} onValueChange={(v) => set("toAccountId", v)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select account" />
@@ -400,9 +400,9 @@ function Field({
   className,
 }: {
   label: string;
-  error?: string;
+  error?: string | undefined;
   children: ReactNode;
-  className?: string;
+  className?: string | undefined;
 }) {
   return (
     <div className={cn("grid gap-1.5", className)}>
