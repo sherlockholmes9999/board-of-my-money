@@ -46,7 +46,7 @@ import {
 import { columnTotals } from "@/lib/finance/calc";
 import { formatAmount, formatDate, todayISO } from "@/lib/finance/format";
 import { useFinance } from "@/lib/finance/store";
-import type { PlanningColumn, Transaction } from "@/lib/finance/types";
+import type { Account, Category, PlanningColumn, Transaction } from "@/lib/finance/types";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "./EmptyState";
 import { SortableTransactionCard, TransactionCardView } from "./TransactionCard";
@@ -408,8 +408,8 @@ interface ColumnProps {
   onEdit: () => void;
   onDelete: () => void;
   onOpenTransaction: (t: Transaction) => void;
-  categories: { id: string; name: string; color: string }[];
-  accounts: { id: string; name: string }[];
+  categories: Category[];
+  accounts: Account[];
 }
 
 function BoardColumn({
