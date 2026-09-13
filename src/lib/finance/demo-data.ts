@@ -11,7 +11,7 @@ export const demoData: FinanceData = {
   accounts: [
     { id: "acc_cash", name: "Cash", type: "Cash", openingBalance: 4650, currency: "EGP" },
     { id: "acc_bank", name: "Bank", type: "Bank", openingBalance: 3000, currency: "EGP" },
-    { id: "acc_wallet", name: "Wallet", type: "Wallet", openingBalance: 465, currency: "EGP" },
+    { id: "acc_wallet", name: "Wallet", type: "Wallet", openingBalance: 1465, currency: "EGP" },
     { id: "acc_savings", name: "Savings", type: "Savings", openingBalance: 2000, currency: "EGP" },
     {
       id: "acc_credit",
