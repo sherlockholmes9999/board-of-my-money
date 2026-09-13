@@ -10,6 +10,9 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { AppHeader } from "../components/finance/AppHeader";
+import { TransactionDialogProvider } from "../components/finance/TransactionDialog";
+import { FinanceProvider } from "../lib/finance/store";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
