@@ -129,8 +129,17 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <FinanceProvider>
+        <TransactionDialogProvider>
+          <div className="min-h-screen bg-background">
+            <AppHeader />
+            <main className="mx-auto max-w-[1600px] px-4 py-6 lg:px-6">
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </main>
+          </div>
+        </TransactionDialogProvider>
+      </FinanceProvider>
     </QueryClientProvider>
   );
 }
