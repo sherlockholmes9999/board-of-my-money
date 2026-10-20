@@ -92,7 +92,7 @@ export function validateRow(
   }
   if (def.parentKey && draft[def.parentKey]) {
     if (draft[def.parentKey] === draft.id) errors[def.parentKey] = "A record cannot be its own parent.";
-    else if (isDescendant(rows, draft[def.parentKey], draft.id, def.parentKey))
+    else if (isDescendant(rows, draft[def.parentKey]!, draft.id, def.parentKey))
       errors[def.parentKey] = "Parent cannot be one of this record's descendants.";
   }
   if (def.key === "intercompanyRules" && draft.fromEntity && draft.fromEntity === draft.toEntity)
