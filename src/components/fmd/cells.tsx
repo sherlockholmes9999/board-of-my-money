@@ -109,7 +109,7 @@ export function filterOptions(token: string, def: CollectionDef, all: All): { va
   }
   if (field.type === "bool") return ["Yes", "No"].map((v) => ({ value: v, label: v }));
   if (field.options) return field.options.map((v) => ({ value: v, label: v }));
-  const distinct = [...new Set(all[def.key].map((r) => r[field.key]).filter(Boolean))].sort();
+  const distinct = [...new Set(all[def.key].map((r) => r[field.key]).filter((v): v is string => !!v))].sort();
   return distinct.map((v) => ({ value: v, label: v }));
 }
 
