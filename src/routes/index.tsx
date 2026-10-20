@@ -1,147 +1,54 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
 
-import { AccountSummary } from "@/components/finance/AccountSummary";
-import { EmptyState } from "@/components/finance/EmptyState";
-import { PageHeader } from "@/components/finance/PageHeader";
-import { PlanningBoard } from "@/components/finance/PlanningBoard";
-import { useTransactionDialog } from "@/components/finance/TransactionDialog";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { boardSummary } from "@/lib/finance/calc";
-import { formatAmount } from "@/lib/finance/format";
-import { useFinance } from "@/lib/finance/store";
-import { cn } from "@/lib/utils";
+import { MODULE_ICONS } from "@/components/fat/FinanceTree";
+import { NodeLink } from "@/components/fat/NodeLink";
+import { StatusBadge } from "@/components/fat/StatusBadge";
+import { APP_NAME, countNodes, financeTree } from "@/lib/fat/tree";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Planning — Personal Financial Board" },
-      {
-        name: "description",
-        content:
-          "Plan and organize your money across time on a horizontal financial board with manual categories, accounts and deterministic totals.",
-      },
-      { property: "og:title", content: "Planning — Personal Financial Board" },
-      {
-        property: "og:description",
-        content: "Plan your income, expenses and transfers period by period.",
-      },
+      { title: `${APP_NAME} — Enterprise Finance Workspace` },
+      { name: "description", content: "Finance Accounting Treasury prototype: module navigation and Financial Master Data." },
+      { property: "og:title", content: `${APP_NAME} — Enterprise Finance Workspace` },
+      { property: "og:description", content: "Navigate the finance architecture and maintain financial master data." },
     ],
   }),
-  component: PlanningPage,
+  component: Home,
 });
 
-function PlanningPage() {
-  const { data, status, error } = useFinance();
-  const dialog = useTransactionDialog();
-  const summary = boardSummary(data);
-  const currency = data.settings.currency;
-
+function Home() {
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Planning"
-        subtitle="Plan and organize your money across time."
-        actions={
-          <>
-            <Select defaultValue={data.settings.defaultPeriod}>
-              <SelectTrigger className="w-[120px]" aria-label="Period type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Week">Week</SelectItem>
-                <SelectItem value="Month">Month</SelectItem>
-                <SelectItem value="Custom">Custom</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={() => dialog.openNew()}>
-              <Plus className="size-4" aria-hidden />
-              Add Transaction
-            </Button>
-          </>
-        }
-      />
-
-      {error ? (
-        <p role="alert" className="rounded-lg border border-destructive/30 bg-negative-soft px-3 py-2 text-sm text-negative">
-          {error}
+    <div>
+      <header className="border-b border-border bg-card px-4 py-4 lg:px-6">
+        <p className="text-xs text-muted-foreground">{APP_NAME}</p>
+        <h1 className="mt-1 text-xl font-semibold">Application modules</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Six modules from the canonical architecture. Financial Master Data is implemented in this phase.
         </p>
-      ) : null}
-
-      <AccountSummary />
-
-      <section aria-label="Board summary" className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        <SummaryTile label="Planned income" value={formatAmount(summary.income, currency)} tone="positive" />
-        <SummaryTile label="Planned expenses" value={formatAmount(-summary.expenses, currency)} tone="negative" />
-        <SummaryTile
-          label="Net"
-          value={formatAmount(summary.net, currency)}
-          tone={summary.net >= 0 ? "positive" : "negative"}
-        />
-        <SummaryTile label="Opening balance" value={formatAmount(summary.opening, currency)} />
-        <SummaryTile label="Planned closing" value={formatAmount(summary.closing, currency)} emphasis />
-      </section>
-
-      {status !== "loading" && data.transactions.length === 0 ? (
-        <EmptyState
-          title="No transactions planned yet."
-          description="Add your first transaction to start planning your money."
-          action={
-            <Button onClick={() => dialog.openNew()}>
-              <Plus className="size-4" aria-hidden />
-              Add Transaction
-            </Button>
-          }
-        />
-      ) : null}
-
-      <PlanningBoard />
+      </header>
+      <div className="p-4 lg:p-6">
+        <ul className="divide-y divide-border rounded-sm border border-border bg-card">
+          {financeTree.map((m) => {
+            const Icon = MODULE_ICONS[m.name]!;
+            return (
+              <li key={m.path}>
+                <NodeLink path={m.path} className="flex items-center gap-4 px-4 py-3 hover:bg-muted/40">
+                  <Icon className="size-4 text-muted-foreground" aria-hidden />
+                  <span className="flex-1 font-medium">{m.name}</span>
+                  <span className="num hidden text-xs text-muted-foreground sm:inline">
+                    {m.children.length} submodules · {countNodes(m) - 1} nodes
+                  </span>
+                  <StatusBadge value={m.implemented ? "Implemented" : "Planned"} />
+                </NodeLink>
+              </li>
+            );
+          })}
+        </ul>
+        <NodeLink path="/map" className="mt-4 inline-block text-sm text-primary hover:underline">
+          Open the Global Finance Map →
+        </NodeLink>
+      </div>
     </div>
-  );
-}
-
-function SummaryTile({
-  label,
-  value,
-  tone,
-  emphasis,
-}: {
-  label: string;
-  value: string;
-  tone?: "positive" | "negative";
-  emphasis?: boolean;
-}) {
-  return (
-    <article
-      className={cn(
-        "rounded-xl border border-border bg-card p-3 shadow-card",
-        emphasis && "border-primary/25 bg-primary text-primary-foreground",
-      )}
-    >
-      <p
-        className={cn(
-          "text-[10px] font-semibold tracking-wider uppercase",
-          emphasis ? "opacity-80" : "text-muted-foreground",
-        )}
-      >
-        {label}
-      </p>
-      <p
-        className={cn(
-          "num mt-1 text-lg font-semibold",
-          !emphasis && tone === "positive" && "text-positive",
-          !emphasis && tone === "negative" && "text-negative",
-        )}
-      >
-        {value}
-      </p>
-    </article>
   );
 }
