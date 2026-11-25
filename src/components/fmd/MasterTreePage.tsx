@@ -22,7 +22,9 @@ export function MasterTreePage({ node, view }: { node: FinanceNode; view: TreeVi
   const parentKey = def.parentKey ?? "parentId";
   const groupField = view.groupBy ? def.fields.find((f) => f.key === view.groupBy) : undefined;
   const groups = groupField?.ref ? all[groupField.ref] : [];
-  const [group, setGroup] = useState<string>("");
+  const [group, setGroup] = useState<string>(() =>
+    view.groupBy ? (repo.items[0]?.[view.groupBy] ?? groups[0]?.id ?? "") : "",
+  );
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());

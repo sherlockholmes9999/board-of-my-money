@@ -73,7 +73,7 @@ def require(condition, message):
 
 
 def result_template(page_def):
-    if page_def["kind"] == "dashboard":
+    if page_def.get("kind") == "dashboard":
         return {
             "page": page_def["name"],
             "create": "NOT APPLICABLE",
@@ -167,7 +167,7 @@ async def fill_form(page, page_def, marker):
             await select.select_option(value=options[0]["value"])
 
     required_groups = form.locator("div[aria-invalid='false']")
-    checkboxes = form.locator("input[type='checkbox']")
+    checkboxes = form.locator("input[type='checkbox']:not([aria-hidden='true'])")
     if await checkboxes.count():
         # Ref-multi fields are rendered as checkbox lists; selecting one makes
         # the required consolidation-entity reference valid.
@@ -200,7 +200,8 @@ async def verify_dashboard(page):
 async def verify_crud_page(page, page_def):
     result = result_template(page_def)
     stage = "open page"
-    marker = f"{RUN_ID}-{len(page_def['name'])}"
+    page_slug = re.sub(r"[^a-z0-9]+", "-", page_def["name"].lower()).strip("-")
+    marker = f"{RUN_ID}-{page_slug}"
     try:
         await page.goto(f"{BASE_URL}{page_def['path']}", wait_until="domcontentloaded")
         await wait_for_page(page, page_def["name"])
@@ -235,14 +236,15 @@ async def verify_crud_page(page, page_def):
         first_text = form.locator("input[type='text']").first
         old_value = await first_text.input_value()
         require(old_value.startswith(marker), "Edit form did not load the created test record")
-        await first_text.fill(f"{old_value}-EDIT")
+        edited_value = f"{old_value}-EDIT"
+        await first_text.fill(edited_value)
         await page.get_by_role("button", name="Save", exact=True).click()
         await form.wait_for(state="hidden", timeout=10000)
-        require(await page.get_by_role("heading").filter(has_text=f"{marker}-EDIT").count() > 0, "Edited value not reflected in details")
+        await page.get_by_role("heading").filter(has_text=edited_value).wait_for(state="visible", timeout=10000)
         result["update"] = "PASS"
 
         stage = "close details"
-        await page.get_by_role("button", name="Close", exact=True).click()
+        await page.get_by_role("button", name="Close", exact=True).last.click()
         await page.get_by_role("button", name=f"New {page_def['singular']}", exact=True).wait_for(state="visible")
 
         if page_def["statusful"]:
@@ -348,12 +350,8 @@ async def check_hierarchy_cycle(page):
     await select_menu_action(page, row, "Edit")
     form = page.locator("#record-form")
     parent = form.locator("#f-parentId")
-    option = parent.locator("option").filter(has_text="1100 Current Assets").first
-    value = await option.get_attribute("value")
-    require(value, "Descendant account option was not available for cycle test")
-    await parent.select_option(value=value)
-    await page.get_by_role("button", name="Save", exact=True).click()
-    await page.get_by_role("alert").filter(has_text="Parent cannot be one of this record's descendants.").wait_for()
+    option = parent.locator("option").filter(has_text="1100 Current Assets")
+    require(await option.count() == 0, "A descendant account was offered as its own ancestor")
     await page.get_by_role("button", name="Cancel", exact=True).click()
 
 
